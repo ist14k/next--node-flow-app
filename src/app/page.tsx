@@ -1,12 +1,14 @@
-import prisma from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth-utils";
 import { caller } from "@/trpc/server";
 
 const page = async () => {
-  const user = await caller.getUsers();
+  await requireAuth();
+  const data = await caller.getUsers();
+
   return (
     <div>
       <h1 className="text-4xl">Hello, World</h1>
-      <pre>{JSON.stringify(user, null, 2)}</pre>
+      {JSON.stringify(data)}
     </div>
   );
 };

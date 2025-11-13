@@ -23,6 +23,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const loginFormSchema = z
   .object({
@@ -195,7 +196,7 @@ export function RegistrationForm({
                   Sign up
                 </Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <a href="#">Login</a>
+                  Already have an account? <Link href="/login">Login</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

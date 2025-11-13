@@ -1,3 +1,4 @@
+import LogoutButton from "@/features/test-components/logout-button";
 import { requireAuth } from "@/lib/auth-utils";
 import { caller } from "@/trpc/server";
 
@@ -8,7 +9,8 @@ const page = async () => {
   return (
     <div>
       <h1 className="text-4xl">Hello, World</h1>
-      {JSON.stringify(data)}
+      <div>{JSON.stringify(data)}</div>
+      <LogoutButton />
     </div>
   );
 };

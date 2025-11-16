@@ -1,9 +1,18 @@
 import { create } from "domain";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 import prisma from "@/lib/prisma";
 import { inngest } from "@/inngest/client";
+import { google } from "@ai-sdk/google";
+import { generateText } from "ai";
 
 export const appRouter = createTRPCRouter({
+  testAi: baseProcedure.mutation(async () => {
+    await inngest.send({
+      name: "test/execute.ai",
+      data: {},
+    });
+    return { success: true, message: "AI execution event queued" };
+  }),
   getWorkflow: protectedProcedure.query(({ ctx }) => {
     return prisma.workflow.findMany();
   }),

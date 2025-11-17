@@ -23,6 +23,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
+import { useHasActiveSubscription } from "@/features/hooks/use-subscription";
+import { auth } from "@/lib/auth";
 
 const menuItems = [
   {
@@ -50,6 +52,7 @@ const menuItems = [
 export const AppSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
 
   return (
     <Sidebar collapsible="icon">
@@ -99,23 +102,25 @@ export const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Upgrade to Pro!"
-              className="gap-x-4 h-10 px-4"
-              onClick={() => {}}
-            >
-              <StarIcon className="w-5 h-5 text-yellow-500" />
-              <span className="text-yellow-500 font-medium">
-                Upgrade to Pro!
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {!hasActiveSubscription && !isLoading && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Upgrade to Pro!"
+                className="gap-x-4 h-10 px-4"
+                onClick={() => authClient.checkout({ slug: "NodeFlow-Pro" })}
+              >
+                <StarIcon className="w-5 h-5 text-yellow-500" />
+                <span className="text-yellow-500 font-medium">
+                  Upgrade to Pro!
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Billing Portal"
               className="gap-x-4 h-10 px-4"
-              onClick={() => {}}
+              onClick={() => authClient.customer.portal()}
             >
               <CreditCardIcon className="w-5 h-5 text-orange-500" />
               <span className="text-orange-500 font-medium">

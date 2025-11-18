@@ -1,6 +1,7 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Input } from "./ui/input";
 
 type EntityHeaderProps = {
   title: string;
@@ -67,6 +68,71 @@ export const EntityContainer: React.FC<{
           {children}
         </div>
         {pagination}
+      </div>
+    </div>
+  );
+};
+
+interface EntitySearchProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+export const EntitySearch: React.FC<EntitySearchProps> = ({
+  value,
+  onChange,
+  placeholder = "Search...",
+}) => {
+  return (
+    <div className="relative ml-auto">
+      <SearchIcon className="size-3.5 absolute left-3 top-1/2 -translate-1/2 text-muted-foreground" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="max-w-[200px] bg-background shadow-none border-border pl-8"
+      />
+    </div>
+  );
+};
+
+interface EntityPaginationProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  disabled?: boolean;
+}
+
+export const EntityPagination: React.FC<EntityPaginationProps> = ({
+  page,
+  totalPages,
+  onPageChange,
+  disabled,
+}) => {
+  return (
+    <div className="flex items-center justify-between gap-x-2 w-full">
+      <div className="flex-1 text-sm text-muted-foreground">
+        <p>
+          Page {page} of {totalPages || 1}
+        </p>
+      </div>
+      <div className="flex items-center justify-end gap-x-2">
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={disabled || page === 1}
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+        >
+          Previous
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={disabled || page === totalPages || totalPages === 0}
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

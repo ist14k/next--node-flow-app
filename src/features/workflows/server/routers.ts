@@ -21,12 +21,28 @@ export const workflowsRouter = createTRPCRouter({
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return prisma.workflow.deleteMany({
+      // Fetch the workflow first to get its data
+      const workflow = await prisma.workflow.findUnique({
         where: {
           id: input.id,
           userId: ctx.auth.user.id,
         },
       });
+
+      if (!workflow) {
+        throw new Error("Workflow not found");
+      }
+
+      // Then delete it
+      await prisma.workflow.deleteMany({
+        where: {
+          id: input.id,
+          userId: ctx.auth.user.id,
+        },
+      });
+
+      // Return the deleted workflow data
+      return workflow;
     }),
   updateName: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string() }))

@@ -31,3 +31,23 @@ export const useCreateWorkflow = () => {
     })
   );
 };
+
+// hooks to delete a workflow
+export const useDeleteWorkflow = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  return useMutation(
+    trpc.workflows.remove.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow "${data.name}" deleted successfully`);
+        queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryOptions({ id: data.id })
+        );
+      },
+      onError: (error) => {
+        toast.error(`Error deleting workflow: ${error.message}`);
+      },
+    })
+  );
+};

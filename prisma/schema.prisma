@@ -12,6 +12,8 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    // The datasource URL is now configured in prisma.config.ts for Migrate and the PrismaClient
+    // (pass `adapter` for a direct DB connection or `accelerateUrl` for Accelerate to the PrismaClient constructor).
 }
 
 model User {
@@ -76,10 +78,55 @@ model Verification {
 }
 
 model Workflow {
-    id        String   @id @default(cuid())
-    userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    name      String
+    id     String @id @default(cuid())
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    name String
+
+    nodes       Node[]
+    connections Connection[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
+}
+
+enum NodeType {
+    INITIAL
+}
+
+model Node {
+    id         String   @id @default(cuid())
+    workflowId String
+    workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+    name     String
+    type     NodeType
+    data     Json     @default("{}")
+    position Json
+
+    outputConnections Connection[] @relation("FromNode")
+    inputConnections  Connection[] @relation("ToNode")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Connection {
+    id         String   @id @default(cuid())
+    workflowId String
+    workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+    fromNodeId String
+    fromNode   Node   @relation("FromNode", fields: [fromNodeId], references: [id], onDelete: Cascade)
+    toNodeId   String
+    toNode     Node   @relation("ToNode", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+    fromOutput String @default("main")
+    toInput    String @default("main")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    @@unique([fromNodeId, fromOutput, toNodeId, toInput])
 }
